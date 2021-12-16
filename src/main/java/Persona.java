@@ -7,5 +7,11 @@ public class Persona {
         this.rut = rut;
 
     }
+    public String getNombre() {
+        return nombre;
+    }
 
+    public String getRut() {
+        return rut;
+    }
 }

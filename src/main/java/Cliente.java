@@ -3,7 +3,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Cliente extends Persona{
+public class Cliente extends Persona implements Guardable{
 
     public Cliente(String nombre, String rut) {
         super(nombre, rut);
@@ -18,5 +18,11 @@ public class Cliente extends Persona{
         }catch (SQLException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String guardadEnHistorial() {
+        String retorno="se a añadido un cliente de nombre: "+getNombre()+" y rut: "+getRut()+".";;
+        return retorno;
     }
 }

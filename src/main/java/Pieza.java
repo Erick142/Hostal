@@ -3,7 +3,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Pieza {
+public class Pieza implements Guardable{
     private int precio;
     private int capacidadPersonas;
     private String estado;
@@ -23,5 +23,11 @@ public class Pieza {
         }catch (SQLException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String guardadEnHistorial() {
+        String retorno="se a creado una pieza de costo: "+this.precio+" pesos por dia y con capacidad de "+this.capacidadPersonas+" personas.";;
+        return retorno;
     }
 }
