@@ -1,25 +1,41 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main {
+public class Hostal {
     public static void main(String[] args) {
         List<String> historial=new ArrayList<>();
+        int nroPiezas=1;
+        List<Pieza> piezasIniciales=new ArrayList<>();
         Scanner teclado = new Scanner(System.in);
         boolean cerrar = false;
         String url = "jdbc:mysql://localhost/hostal";
         String usuario = "root";
         String contraseña = "";
+        boolean error2=false;
+        do {
+            error2=false;
+            try {
+                System.out.println("ingrese nro de piezas del hostal");
+                nroPiezas= teclado.nextInt();
+            }catch (Exception e){
+                error2=true;
+                teclado.next();
+                System.err.println("ingreso un valor que no es int");
+            }
+        }while (error2);
+        piezasIniciales=generarHostal(nroPiezas);
         do {
             try {
                 int seleccion = 0;
                 System.out.println("--------------------------------------------------------\n" +
-                        "MENU\n1-añadir empleado\n2-añadir cliente\n3-añadir pieza\n4-hacer registro\n5-ver registros\n6-ver piezas\n7-ver historial de esta sesion\n8-eliminar un registro\n9-limpiar base de datos" +
+                        "MENU\n1-añadir empleado\n2-añadir cliente\n3-añadir pieza\n4-hacer registro\n5-ver registro\n6-ver piezas\n7-ver historial de esta sesion\n8-eliminar un registro\n9-limpiar base de datos" +
                         "\n--------------------------------------------------------");
                 seleccion = teclado.nextInt();
                 String nombre = "", rut = "";
-                int costo = 0, capacidadPersonas = 0;
+                int costo = 0, capacidadPersonas = 0,sueldo=0;
                 switch (seleccion) {
                     case 1:
                         try {
@@ -27,11 +43,18 @@ public class Main {
                             nombre = teclado.next();
                             System.out.println("ingrese rut del empleado");
                             rut = teclado.next();
-                            historial.add(new Empleado(nombre,rut).guardadEnHistorial());
-                        } catch (Exception e) {
+                            System.out.println("ingrese sueldo del empleado");
+                            sueldo= teclado.nextInt();
+                            historial.add(new Empleado(nombre,rut,sueldo).guardadEnHistorial());
+                        } catch (InputMismatchException e) {
+                            System.err.println("usted ingreso un valor ivalido");
                             teclado.next();
-                            System.err.println("parametro invalido");
 
+
+                        }
+                        catch (Exception e){
+                            teclado.next();
+                            System.err.println("ocurrio un error inesperado");
                         }
                         break;
                     case 2:
@@ -65,17 +88,23 @@ public class Main {
                             Statement e = conn.createStatement();
                             Statement e3 = conn.createStatement();
                             Statement e4 = conn.createStatement();
+                            Statement a = conn.createStatement();
+                            Statement a1 = conn.createStatement();
+                            Statement a2 = conn.createStatement();
                             ResultSet verclientes = e.executeQuery("select * from cliente");
                             ResultSet verempleados = e3.executeQuery("select * from empleado");
                             ResultSet verpieza = e4.executeQuery("select * from pieza");
+                            ResultSet verclientes2 = a.executeQuery("select * from cliente");
+                            ResultSet verempleados2 = a1.executeQuery("select * from empleado");
+                            ResultSet verpieza2 = a2.executeQuery("select * from pieza");
                             if (!verclientes.next() || !verpieza.next() || !verempleados.next()) {
-                                if (!verclientes.next()) {
+                                if (!verclientes2.next()) {
                                     System.out.println("faltan clientes");
                                 }
-                                if (!verpieza.next()) {
+                                if (!verpieza2.next()) {
                                     System.out.println("faltan pieza");
                                 }
-                                if (!verempleados.next()) {
+                                if (!verempleados2.next()) {
                                     System.out.println("faltan empleados");
                                 }
                             } else {
@@ -99,9 +128,8 @@ public class Main {
                                 historial.add("el empleado de id: "+idEmpleado+" a registrado al cliente de rut: "+rutCliente+" en la pieza nro "+idPieza+".");
                                 try (Connection con = DriverManager.getConnection(url, usuario, contraseña)) {
                                     Statement e2 = con.createStatement();
-                                    e2.execute("insert into registro(id_empleado,id_pieza,rut_cliente) values('" + idEmpleado + "','" + idPieza + "','" + rutCliente + "')");
+                                    new Registro(idEmpleado,rutCliente,idPieza);
                                     e2.execute("update pieza set disponibilidad='ocupada' where id_pieza=" + "'" + idPieza + "'");
-                                    System.out.println("registro creado correctamente");
                                 } catch (SQLException es) {
                                     es.printStackTrace();
                                     System.err.println("ingreso un dato que no existe");
@@ -115,6 +143,7 @@ public class Main {
                         mostrarRegistros();
                         break;
                     case 6:
+                        System.out.println("piezas iniciales: "+piezasIniciales.size());
                         mostrarPiezas("select * from pieza");
                         break;
                     case 7:
@@ -176,7 +205,7 @@ public class Main {
             e.executeUpdate("drop table pieza");
             e.executeUpdate("create table pieza(id_pieza int not null auto_increment primary key, precio_pieza int not null, personas_pieza int not null, disponibilidad varchar(12) not null)");
             e.executeUpdate("create table cliente(rut_cliente varchar(12) not null primary key, nombre_cliente varchar(60) not null)");
-            e.executeUpdate("create table empleado(id_empleado int not null auto_increment primary key, rut_empleado varchar(12) not null, nombre_empleado varchar(50) not null)");
+            e.executeUpdate("create table empleado(id_empleado int not null auto_increment primary key, rut_empleado varchar(12) not null, nombre_empleado varchar(50) not null,sueldo int not null)");
             e.executeUpdate("create table registro(id_empleado int not null, id_pieza int not null, id_registro int not null auto_increment primary key, rut_cliente varchar(12) not null)");
             //añadir llaves foraneas.
             e.executeUpdate("alter table registro add constraint fk_empleado foreign key(id_empleado) references empleado(id_empleado)");
@@ -255,5 +284,13 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public static ArrayList generarHostal(int nroPiezas){
+        ArrayList<Pieza> array=new ArrayList<>();
+        for (int i=0;i<nroPiezas;i++){
+            array.add(new Pieza(-1));
+        }
+        System.out.println("piezas generadas: "+nroPiezas);
+        return array;
     }
 }

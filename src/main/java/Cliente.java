@@ -22,7 +22,7 @@ public class Cliente extends Persona implements Guardable{
 
     @Override
     public String guardadEnHistorial() {
-        String retorno="se a añadido un cliente de nombre: "+getNombre()+" y rut: "+getRut()+".";;
+        String retorno="se a añadido un cliente de nombre: "+getNombre()+" y rut: "+getRut()+".";
         return retorno;
     }
 }

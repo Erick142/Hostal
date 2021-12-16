@@ -8,6 +8,20 @@ public class Pieza implements Guardable{
     private int capacidadPersonas;
     private String estado;
 
+    public Pieza(int i) {
+        String url = "jdbc:mysql://localhost/hostal";
+        String usuario = "root";
+        String contraseña = "";
+        if (i==-1){
+            try (Connection con= DriverManager.getConnection(url, usuario, contraseña)){
+                Statement e=con.createStatement();
+                e.execute("insert into pieza(precio_pieza,personas_pieza,disponibilidad) values('"+30000+"','"+2+"','"+"disponible"+"')");
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
     public Pieza(int precio, int capacidadPersonas, String estado) {
         this.precio = precio;
         this.capacidadPersonas = capacidadPersonas;
