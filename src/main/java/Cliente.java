@@ -16,7 +16,7 @@ public class Cliente extends Persona implements Guardable{
             e.execute("insert into cliente(nombre_cliente,rut_cliente) values('"+nombre+"','"+rut+"')");
             System.out.println("Cliente ingresada correctamente");
         }catch (SQLException e){
-            e.printStackTrace();
+            System.err.println("rut duplicado");
         }
     }
 

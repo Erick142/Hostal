@@ -31,7 +31,7 @@ public class Hostal {
             try {
                 int seleccion = 0;
                 System.out.println("--------------------------------------------------------\n" +
-                        "MENU\n1-añadir empleado\n2-añadir cliente\n3-añadir pieza\n4-hacer registro\n5-ver registro\n6-ver piezas\n7-ver historial de esta sesion\n8-eliminar un registro\n9-limpiar base de datos" +
+                        "MENU\n1-añadir empleado\n2-añadir cliente\n3-añadir pieza\n4-hacer registro\n5-ver registro\n6-ver piezas\n7-ver historial de esta sesion\n8-eliminar un registro\n9-limpiar base de datos\n10-salir" +
                         "\n--------------------------------------------------------");
                 seleccion = teclado.nextInt();
                 String nombre = "", rut = "";
@@ -131,19 +131,18 @@ public class Hostal {
                                     new Registro(idEmpleado,rutCliente,idPieza);
                                     e2.execute("update pieza set disponibilidad='ocupada' where id_pieza=" + "'" + idPieza + "'");
                                 } catch (SQLException es) {
-                                    es.printStackTrace();
                                     System.err.println("ingreso un dato que no existe");
                                 }
                             }
                         } catch (SQLException e) {
-                            e.printStackTrace();
+                            System.err.println("ingreso un dato que no existe");
                         }
                         break;
                     case 5:
                         mostrarRegistros();
                         break;
                     case 6:
-                        System.out.println("piezas iniciales: "+piezasIniciales.size());
+                        System.out.println("cantidad de piezas: "+piezasIniciales.size());
                         mostrarPiezas("select * from pieza");
                         break;
                     case 7:
@@ -164,7 +163,6 @@ public class Hostal {
                             System.out.println("registro eliminado correctamente");
                             historial.add("se a eliminado el registro de id: "+id_registro);
                         } catch (SQLException e) {
-                            e.printStackTrace();
                             System.err.println("no se pudo eliminar el registro");
                         }
                         try (Connection conn = DriverManager.getConnection(url, usuario, contraseña)) {
@@ -173,13 +171,13 @@ public class Hostal {
                             System.out.println("pieza disponible");
                             historial.add("se a liberado la pieza nro: "+id_pieza);
                         } catch (SQLException e) {
-                            e.printStackTrace();
                             System.err.println("no se pudo actualizar la pieza");
                         }
                         break;
                     case 9:
                         truncarBD();
                         historial.add("la base de datos fue limpiada");
+                        piezasIniciales.clear();
                         break;
                     case 10:
                         cerrar = true;
@@ -213,7 +211,7 @@ public class Hostal {
             e.executeUpdate("alter table registro add constraint fk_rut_cliente foreign key(rut_cliente) references cliente(rut_cliente)");
             System.out.println("limpiado correctamente");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("no se pudo limpiar la base de datos");
         }
     }
 
@@ -228,8 +226,8 @@ public class Hostal {
             while (rs.next()) {
                 System.out.println("id:" + rs.getInt("id_empleado") + " -nombre: " + rs.getString("nombre_empleado") + " -rut: " + rs.getString("rut_empleado"));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("no se pudo acceder a los empleados");
         }
     }
 
@@ -244,8 +242,8 @@ public class Hostal {
             while (rs.next()) {
                 System.out.println("nombre:" + rs.getString("nombre_cliente") + " -rut: " + rs.getString("rut_cliente"));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("no se pudo acceder a los clientes");
         }
     }
 
@@ -260,8 +258,8 @@ public class Hostal {
             while (rs.next()) {
                 System.out.println("id:" + rs.getInt("id_pieza") + " -precio: " + rs.getInt("precio_pieza") + " -capacidad de personas: " + rs.getInt("personas_pieza") + " -estado: " + rs.getString("disponibilidad"));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("no se pudo acceder a las piezas");
         }
     }
     public static void mostrarRegistros(){
@@ -281,8 +279,8 @@ public class Hostal {
             if (!mostrarregistros2.next()) {
                 System.out.println("registro vacio");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            System.err.println("no se pudo acceder a los registros");
         }
     }
     public static ArrayList generarHostal(int nroPiezas){

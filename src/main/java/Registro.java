@@ -21,7 +21,6 @@ public class Registro {
             e.execute("insert into registro(id_empleado,rut_cliente,id_pieza) values("+idEmpleado+",'"+rutCliente+"',"+idPieza+")");
             System.out.println("registro guardado");
         }catch (SQLException e){
-            e.printStackTrace();
         }
     }
 }

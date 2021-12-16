@@ -22,7 +22,6 @@ public class Empleado extends Persona implements Guardable{
             e.execute("insert into empleado(nombre_empleado,rut_empleado,sueldo) values('"+nombre+"','"+rut+"','"+sueldo+"')");
             System.out.println("Empleado ingresada correctamente");
         }catch (SQLException e){
-            e.printStackTrace();
         }
     }
 
